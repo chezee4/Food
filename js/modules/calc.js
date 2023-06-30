@@ -1,7 +1,8 @@
-const calc = () => {
+function calc() {
   // Calculator
 
   const result = document.querySelector(".calculating__result span");
+  const additionalResultText = document.querySelector(".calculating__result p");
 
   let sex, height, weight, age, ratio;
 
@@ -11,7 +12,6 @@ const calc = () => {
     sex = "female";
     localStorage.setItem("sex", "female");
   }
-
   if (localStorage.getItem("ratio")) {
     ratio = localStorage.getItem("ratio");
   } else {
@@ -19,25 +19,23 @@ const calc = () => {
     localStorage.setItem("ratio", 1.375);
   }
 
-  function calcTotal() {
+  const calcTotal = () => {
     if (!sex || !height || !weight || !age || !ratio) {
       result.textContent = "____";
       return;
     }
-    if (sex === "female") {
-      result.textContent = Math.round(
-        (447.6 + 9.2 * weight + 3.1 * height - 4.3 * age) * ratio
-      );
-    } else {
-      result.textContent = Math.round(
-        (88.36 + 13.4 * weight + 4.8 * height - 5.7 * age) * ratio
-      );
-    }
-  }
+
+    result.textContent =
+      sex === "female"
+        ? Math.round((447.6 + 9.2 * weight + 3.1 * height - 4.3 * age) * ratio)
+        : Math.round(
+            (88.36 + 13.4 * weight + 4.8 * height - 5.7 * age) * ratio
+          );
+  };
 
   calcTotal();
 
-  function initLocalSettings(selector, activeClass) {
+  const initLocalSettings = (selector, activeClass) => {
     const elements = document.querySelectorAll(selector);
 
     elements.forEach((elem) => {
@@ -49,72 +47,81 @@ const calc = () => {
         elem.classList.add(activeClass);
       }
     });
-  }
+  };
 
-  initLocalSettings("#gender div", "calculating__choose-item_active");
+  initLocalSettings("#gender p", "calculating__choose-item_active");
   initLocalSettings(
-    ".calculating__choose_big div",
+    ".calculating__choose_big p",
     "calculating__choose-item_active"
   );
 
-  function getStaticInformation(selector, activeClass) {
+  const getStaticInfo = (selector, activeClass) => {
     const elements = document.querySelectorAll(selector);
 
     elements.forEach((elem) => {
       elem.addEventListener("click", (e) => {
         if (e.target.getAttribute("data-ratio")) {
           ratio = +e.target.getAttribute("data-ratio");
+
           localStorage.setItem("ratio", +e.target.getAttribute("data-ratio"));
         } else {
           sex = e.target.getAttribute("id");
+
           localStorage.setItem("sex", e.target.getAttribute("id"));
         }
 
-        elements.forEach((elem) => {
-          elem.classList.remove(activeClass);
+        elements.forEach((element) => {
+          element.classList.remove(activeClass);
         });
-
         e.target.classList.add(activeClass);
-
         calcTotal();
       });
     });
-  }
+  };
 
-  getStaticInformation("#gender div", "calculating__choose-item_active");
-  getStaticInformation(
-    ".calculating__choose_big div",
+  getStaticInfo("#gender p", "calculating__choose-item_active");
+  getStaticInfo(
+    ".calculating__choose_big p",
     "calculating__choose-item_active"
   );
 
-  function getDynamicInformation(selector) {
+  const getDynamycInfo = (selector) => {
     const input = document.querySelector(selector);
-
+    const maxInputValue = 350;
+    const minImputValue = 0;
     input.addEventListener("input", () => {
-      if (input.value.match(/\D/g)) {
-        input.style.border = "1px solid red";
-      } else {
+      if (
+        input.value <= maxInputValue &&
+        input.value >= minImputValue &&
+        !input.value.match(/\D/g)
+      ) {
+        switch (input.getAttribute("id")) {
+          case "height":
+            height = +input.value;
+            break;
+          case "weight":
+            weight = +input.value;
+            break;
+          case "age":
+            age = +input.value;
+            break;
+        }
+        calcTotal();
         input.style.border = "none";
+        additionalResultText.textContent = "ккал";
+        result.style.fontSize = "";
+      } else {
+        result.textContent = "Неверные данные";
+        result.style.fontSize = "28px";
+        input.style.border = "2px solid red";
+        additionalResultText.textContent = "";
       }
-      switch (input.getAttribute("id")) {
-        case "height":
-          height = +input.value;
-          break;
-        case "weight":
-          weight = +input.value;
-          break;
-        case "age":
-          age = +input.value;
-          break;
-      }
-
-      calcTotal();
     });
-  }
+  };
 
-  getDynamicInformation("#height");
-  getDynamicInformation("#weight");
-  getDynamicInformation("#age");
-};
+  getDynamycInfo("#height");
+  getDynamycInfo("#weight");
+  getDynamycInfo("#age");
+}
 
 module.exports = calc;

@@ -8,7 +8,7 @@ const slider = () => {
     corrent = document.querySelector("#current"),
     slidesWrapper = document.querySelector(".offer__slider-wrapper"),
     sliderField = document.querySelector(".offer__slider-inner"),
-    width = this.window.getComputedStyle(slidesWrapper).width;
+    width = window.getComputedStyle(slidesWrapper).width;
   let slideIndex = 1;
   let offset = 0;
 
@@ -25,9 +25,7 @@ const slider = () => {
   sliderField.style.transition = "0.5s all";
 
   slidesWrapper.style.overflow = "hidden";
-  slides.forEach((slide) => {
-    slide.style.width = width;
-  });
+  slides.forEach((slide) => (slide.style.width = width));
   slider.style.position = "relative";
   const indicators = document.createElement("ol"),
     dots = [];
